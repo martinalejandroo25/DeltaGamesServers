@@ -1,0 +1,19 @@
+{
+  "id": "gmod",
+  "name": "Garry's Mod Dedicated Server",
+  "steamAppId": "4020",
+  "baseImage": "deltagames/steamcmd-base:latest",
+  "startBinary": "srcds_run",
+  "defaultParams": "-game garrysmod -console +maxplayers 16 +map gm_construct +gamemode sandbox",
+  "environment": {
+    "AUTO_UPDATE": "true"
+  },
+  "ports": [
+    { "containerPort": 27015, "protocol": "UDP", "description": "Game Port" },
+    { "containerPort": 27015, "protocol": "TCP", "description": "RCON / Query Port" }
+  ],
+  "volumes": [
+    { "containerPath": "/home/steam/game/garrysmod/cfg", "description": "Config files" },
+    { "containerPath": "/home/steam/game/garrysmod/addons", "description": "Addons directory" }
+  ]
+}

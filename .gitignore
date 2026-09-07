@@ -1,0 +1,29 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Frontend
+web/node_modules/
+web/dist/
+node_modules/
+dist/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Environments
+.env
+.env.*
+
+# IDEs & System
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

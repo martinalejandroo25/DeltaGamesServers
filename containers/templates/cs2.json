@@ -1,0 +1,18 @@
+{
+  "id": "cs2",
+  "name": "Counter-Strike 2 Dedicated Server",
+  "steamAppId": "730",
+  "baseImage": "deltagames/steamcmd-base:latest",
+  "startBinary": "game/bin/linux64/cs2",
+  "defaultParams": "-dedicated +map de_dust2",
+  "environment": {
+    "AUTO_UPDATE": "true"
+  },
+  "ports": [
+    { "containerPort": 27015, "protocol": "UDP", "description": "Game Port" },
+    { "containerPort": 27015, "protocol": "TCP", "description": "RCON Port" }
+  ],
+  "volumes": [
+    { "containerPath": "/home/steam/game/game/csgo/cfg", "description": "Config Directory" }
+  ]
+}

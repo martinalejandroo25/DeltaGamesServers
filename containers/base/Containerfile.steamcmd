@@ -1,0 +1,62 @@
+# Base OCI Image altamente optimizada para Servidores de Juegos SteamCMD
+FROM debian:bookworm-slim
+
+LABEL maintainer="DeltaGamesServers Team"
+LABEL description="Base OCI Image with SteamCMD and 32/64-bit runtime dependencies for dedicated game servers"
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV STEAM_DIR="/home/steam/steamcmd"
+ENV GAME_DIR="/home/steam/game"
+
+# Instalación de dependencias críticas de 32 bits y 64 bits para SteamCMD y motores de juegos (Source Engine, Unity, Unreal)
+RUN dpkg --add-architecture i386 && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        wget \
+        tar \
+        bzip2 \
+        gzip \
+        unzip \
+        python3 \
+        procps \
+        lib32gcc-s1 \
+        lib32stdc++6 \
+        libsdl2-2.0-0:i386 \
+        libsdl2-2.0-0 \
+        libcurl4-gnutls-dev:i386 \
+        libcurl4 \
+        locales \
+        tmux \
+        net-tools \
+        gdb && \
+    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    locale-gen && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+
+# Creación de usuario sin privilegios 'steam' con UID/GID 1000 compatible con mapeos de usuario Rootless de Podman
+RUN groupadd -g 1000 steam && \
+    useradd -u 1000 -g steam -m -s /bin/bash steam
+
+USER steam
+WORKDIR /home/steam
+
+# Instalación de SteamCMD en el directorio del usuario
+RUN mkdir -p ${STEAM_DIR} ${GAME_DIR} && \
+    cd ${STEAM_DIR} && \
+    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - && \
+    ./steamcmd.sh +quit || true
+
+# Script de entrada para gestión dinámica de instalación y arranque
+COPY --chown=steam:steam entrypoint.sh /home/steam/entrypoint.sh
+RUN chmod +x /home/steam/entrypoint.sh
+
+EXPOSE 27015/tcp 27015/udp 27020/udp
+
+ENTRYPOINT ["/home/steam/entrypoint.sh"]
